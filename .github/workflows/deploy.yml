@@ -1,0 +1,39 @@
+name: CI/CD Pipeline
+
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+    branches:
+      - main
+
+
+jobs:
+  install_k8s:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: k8s-tools
+        run: |
+          curl -O https://get.helm.sh/helm-v3.16.2-linux-amd64.tar.gz
+          tar -xf helm-v3.16.2-linux-amd64.tar.gz
+          sudo mv linux-amd64/helm /usr/local/bin
+          sudo chmod +x /usr/local/bin/helm
+          curl -LO "https://dl.k8s.io/release/$(curl -L -s https://dl.k8s.io/release/stable.txt)/bin/linux/amd64/kubectl"
+          sudo install -o root -g root -m 0755 kubectl /usr/local/bin/kubectl
+          mkdir -p ~/.kube
+          echo "${{ secrets.KUBECONFIG }}" > ~/.kube/config
+          chmod 600 ~/.kube/config
+
+      - name: install-wp
+        run: helm install my-wp ./Chart-wp --set wp.image=wordpress:6.2.1-apache --set namespace=wp --set mysql.pass="${{ secrets.MYSQL_PASS }}" -n wp
+          
+      - name: check-wp
+        run: |
+          helm list
+          helm list -n wp
+          kubectl get all -n wp
+          kubectl get all

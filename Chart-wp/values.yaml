@@ -1,0 +1,20 @@
+namespace: default
+app: wordpress
+
+mysql:
+  image: mysql:8.0
+  pass: CHANGE_ME
+  mountPath: /var/lib/mysql
+  MYSQL_DATABASE: wordpress
+  MYSQL_USER: wordpress
+  port: 3306
+
+# {{ .Values.mysql.MYSQL_USER }}
+
+wp:
+  image: wordpress:6.2.1-apache # 6.2.2-apache
+  mountPath: /var/www/html
+  port: 80
+  nodePort: 32000
+
+  
