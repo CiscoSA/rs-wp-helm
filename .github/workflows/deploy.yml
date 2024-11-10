@@ -29,7 +29,7 @@ jobs:
           chmod 600 ~/.kube/config
 
       - name: install-wp
-        run: helm install my-wp ./Chart-wp --set wp.image=wordpress:6.2.1-apache --set namespace=wp --set mysql.pass="${{ secrets.MYSQL_PASS }}" -n wp
+        run: helm install my-wp ./Chart-wp --set wp.image=wordpress:6.2.1-apache --set namespace=wp --set mysql.pass="${{ secrets.MYSQL_PASS }}" -n wp --create-namespace
           
       - name: check-wp
         run: |
